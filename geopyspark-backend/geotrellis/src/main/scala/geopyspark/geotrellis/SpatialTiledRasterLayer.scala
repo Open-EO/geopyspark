@@ -20,14 +20,15 @@ import geotrellis.raster.mapalgebra.focal.hillshade._
 import geotrellis.raster.rasterize._
 import geotrellis.raster.render._
 import geotrellis.raster.resample.{ResampleMethod, PointResampleMethod, Resample}
+import geotrellis.raster.buffer.BufferedTile
 import geotrellis.spark._
 import geotrellis.spark.buffer._
 import geotrellis.spark.costdistance.IterativeCostDistance
-import geotrellis.spark.io._
-import geotrellis.spark.io.json._
 import geotrellis.spark.mapalgebra.local._
 import geotrellis.spark.mapalgebra.focal._
-import geotrellis.spark.mask.Mask
+import geotrellis.layer._
+import geotrellis.layer.mask.Mask
+import geotrellis.spark.mask.MaskRDD
 import geotrellis.spark.pyramid._
 import geotrellis.spark.rasterize._
 import geotrellis.spark.reproject._
@@ -39,8 +40,9 @@ import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.triangulation._
 import geotrellis.vector.voronoi._
 
-import spray.json._
-import spray.json.DefaultJsonProtocol._
+import _root_.io.circe.syntax._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
 import spire.syntax.cfor._
 
 import org.locationtech.jts.geom.Coordinate
@@ -190,7 +192,7 @@ class SpatialTiledRasterLayer(
         getNeighborhood(neighborhood, param1, param2, param3)
 
     val cellSize = rdd.metadata.layout.cellSize
-    val op: ((Tile, Option[GridBounds]) => Tile) = getOperation(operation, _neighborhood, cellSize, param1)
+    val op: ((Tile, Option[GridBounds[Int]]) => Tile) = getOperation(operation, _neighborhood, cellSize, param1)
 
     val result: TileLayerRDD[SpatialKey] =
       partitionStrategy match {
@@ -236,7 +238,7 @@ class SpatialTiledRasterLayer(
     val mt = rdd.metadata.mapTransform
     val cellSize = rdd.metadata.cellSize
     val neighborhood = Square(1)
-    val gridBounds = rdd.metadata.gridBounds
+    val gridBounds = rdd.metadata.tileBounds
     val partitioner = rdd.partitioner
 
     SpatialTiledRasterLayer(
@@ -257,7 +259,7 @@ class SpatialTiledRasterLayer(
   }
 
   def mask(geometries: Seq[MultiPolygon]): TiledRasterLayer[SpatialKey] =
-    SpatialTiledRasterLayer(zoomLevel, Mask(rdd, geometries, Mask.Options.DEFAULT))
+    SpatialTiledRasterLayer(zoomLevel, MaskRDD(rdd, geometries, Mask.Options.DEFAULT))
 
   def mask(
     groupedRDD: RDD[(SpatialKey, Iterable[Geometry])],
@@ -310,8 +312,8 @@ class SpatialTiledRasterLayer(
       .value
       .groupBy(_._1)
       .map { case (k, vs) => k.toString -> vs.map { case (_, v) => v }.sum.toString }
-      .toJson
-      .compactPrint
+      .asJson
+      .noSpaces
   }
 
   def stitch: Array[Byte] =
@@ -535,7 +537,7 @@ object SpatialTiledRasterLayer {
     javaRDD: JavaRDD[Array[Byte]],
     metadata: String
   ): SpatialTiledRasterLayer = {
-    val md = metadata.parseJson.convertTo[TileLayerMetadata[SpatialKey]]
+    val md = parse(metadata).valueOr(throw _).as[TileLayerMetadata[SpatialKey]].valueOr(throw _)
     val tileLayer = MultibandTileLayerRDD(
       PythonTranslator.fromPython[(SpatialKey, MultibandTile), ProtoTuple](javaRDD, ProtoTuple.parseFrom), md)
 
@@ -547,7 +549,7 @@ object SpatialTiledRasterLayer {
     zoomLevel: Int,
     metadata: String
   ): SpatialTiledRasterLayer = {
-    val md = metadata.parseJson.convertTo[TileLayerMetadata[SpatialKey]]
+    val md = parse(metadata).valueOr(throw _).as[TileLayerMetadata[SpatialKey]].valueOr(throw _)
     val tileLayer = MultibandTileLayerRDD(
       PythonTranslator.fromPython[(SpatialKey, MultibandTile), ProtoTuple](javaRDD, ProtoTuple.parseFrom), md)
 
@@ -579,7 +581,7 @@ object SpatialTiledRasterLayer {
     partitionStrategy: PartitionStrategy
   ): SpatialTiledRasterLayer = {
     val geomRDD = geomWKB.map { WKB.read }
-    val fullEnvelope = geomRDD.map(_.envelope).reduce(_ combine _)
+    val fullEnvelope = geomRDD.map(_.extent).reduce(_ combine _)
 
     rasterizeGeometry(
       geomRDD,
@@ -603,7 +605,7 @@ object SpatialTiledRasterLayer {
     partitionStrategy: PartitionStrategy
   ): SpatialTiledRasterLayer = {
     val geoms = geomWKB.asScala.map(WKB.read)
-    val fullEnvelope = geoms.map(_.envelope).reduce(_ combine _)
+    val fullEnvelope = geoms.map(_.extent).reduce(_ combine _)
     val geomRDD = sc.parallelize(geoms)
 
     rasterizeGeometry(
@@ -669,7 +671,7 @@ object SpatialTiledRasterLayer {
     val scalaRDD =
       PythonTranslator.fromPython[Feature[Geometry, CellValue], ProtoFeatureCellValue](featureRDD, ProtoFeatureCellValue.parseFrom)
 
-    val fullEnvelope = scalaRDD.map(_.geom.envelope).reduce(_ combine _)
+    val fullEnvelope = scalaRDD.map(_.geom.extent).reduce(_ combine _)
 
     val cellType = CellType.fromName(requestedCellType)
     val zCellType = CellType.fromName(zIndexCellType)
@@ -707,13 +709,13 @@ object SpatialTiledRasterLayer {
     val srcCRS = TileLayer.getCRS(geomCRSStr).get
     val LayoutLevel(z, ld) = ZoomedLayoutScheme(srcCRS).levelForZoom(requestedZoom)
     val maptrans = ld.mapTransform
-    val gb @ GridBounds(cmin, rmin, cmax, rmax) = maptrans(geom.envelope)
+    val gb @ GridBounds(cmin, rmin, cmax, rmax) = maptrans(geom.extent)
 
     val keys = for (r <- rmin to rmax; c <- cmin to cmax) yield SpatialKey(c, r)
 
     val pts =
       if (geom.isInstanceOf[MultiPoint]) {
-        geom.asInstanceOf[MultiPoint].points.map(_.jtsGeom.getCoordinate)
+        geom.asInstanceOf[MultiPoint].points.map(_.getCoordinate)
       } else {
         val coords = collection.mutable.ListBuffer.empty[Coordinate]
 

@@ -2,8 +2,8 @@ package geopyspark.geotrellis.tms
 
 import geopyspark.geotrellis.TiledRasterLayer
 import geotrellis.raster._
-import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.layer._
+import geotrellis.store._
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import org.apache.spark.rdd.RDD

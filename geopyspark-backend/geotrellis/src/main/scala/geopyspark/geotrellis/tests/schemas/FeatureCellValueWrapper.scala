@@ -24,8 +24,8 @@ object FeatureCellValueWrapper {
 
   def testRDD(sc: SparkContext): RDD[Feature[Geometry, CellValue]] = {
     val points: Seq[Point] = for (x <- 0 until 10) yield Point(x, x + 2)
-    val lines: Seq[Line] = points.grouped(5).map { Line(_) }.toSeq
-    val multiLines = MultiLine(lines)
+    val lines: Seq[LineString] = points.grouped(5).map { LineString(_) }.toSeq
+    val multiLines = MultiLineString(lines)
 
     sc.parallelize(
       Array(

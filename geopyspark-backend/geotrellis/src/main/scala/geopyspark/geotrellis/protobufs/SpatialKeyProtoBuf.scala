@@ -2,7 +2,7 @@ package geopyspark.geotrellis.protobufs
 
 import geopyspark.util._
 import geopyspark.geotrellis._
-import geotrellis.spark._
+import geotrellis.layer._
 import protos.keyMessages._
 
 

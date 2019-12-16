@@ -2,16 +2,18 @@ package geopyspark.geotrellis.io
 
 import geopyspark.geotrellis._
 
-import geotrellis.spark._
-import geotrellis.spark.io._
-import geotrellis.spark.io.cog._
-import geotrellis.spark.io.file._
-import geotrellis.spark.io.hadoop._
-import geotrellis.spark.io.json._
-import geotrellis.spark.io.s3._
+import geotrellis.layer._
+import geotrellis.store._
+import geotrellis.store.cog._
+import geotrellis.store.file._
+import geotrellis.store.hadoop._
+import geotrellis.store.json._
+import geotrellis.store.s3._
 
-import spray.json._
-import spray.json.DefaultJsonProtocol._
+import _root_.io.circe.Json
+import _root_.io.circe.syntax._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
 
 import org.apache.spark._
 
@@ -38,17 +40,17 @@ class AttributeStoreWrapper(uri: String) {
                 .readMetadata[COGLayerStorageMetadata[SpatialKey]](LayerId(id.name, 0))
                 .metadata
                 .tileLayerMetadata(id.zoom)
-                .toJson
+                .asJson
             case "geotrellis.spark.SpaceTimeKey" =>
               attributeStore
                 .readMetadata[COGLayerStorageMetadata[SpaceTimeKey]](LayerId(id.name, 0))
                 .metadata
                 .tileLayerMetadata(id.zoom)
-                .toJson
+                .asJson
           }
-        case _ => attributeStore.readMetadata[JsObject](id)
+        case _ => attributeStore.readMetadata[Json](id)
       }
-    json.compactPrint
+    json.noSpaces
   }
 
   /** Read any attribute store value as JSON object.
@@ -57,8 +59,8 @@ class AttributeStoreWrapper(uri: String) {
   def read(layerName: String, zoom: Int, attributeName: String): String = {
     val id = LayerId(layerName, zoom)
     try {
-      val json = attributeStore.read[JsValue](id, attributeName)
-      return json.compactPrint
+      val json = attributeStore.read[Json](id, attributeName)
+      return json.noSpaces
     } catch {
       case e: AttributeNotFoundError =>
         return null
@@ -69,7 +71,7 @@ class AttributeStoreWrapper(uri: String) {
   def write(layerName: String, zoom: Int, attributeName: String, value: String): Unit = {
     val id = LayerId(layerName, zoom)
     if (value == null) return
-    val json = value.parseJson // ensure we actually have JSON here
+    val json = parse(value).valueOr(throw _) // ensure we actually have JSON here
     attributeStore.write(id, attributeName, json)
   }
 

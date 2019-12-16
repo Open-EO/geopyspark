@@ -1,10 +1,10 @@
 package geopyspark.geotrellis
 
+import geotrellis.layer._
 import geotrellis.spark._
-import geotrellis.spark.io.index._
-import geotrellis.spark.io.index.zcurve._
+import geotrellis.store.index._
+import geotrellis.store.index.zcurve._
 import geotrellis.util._
-
 import org.apache.spark._
 
 import scala.reflect._

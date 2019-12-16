@@ -4,7 +4,7 @@ import geopyspark.util.ProtoBufCodec
 import protos.tileMessages._
 import geotrellis.raster._
 
-import geotrellis.contrib.vlm.PaddedTile
+import geotrellis.raster.PaddedTile
 
 
 trait TileProtoBuf {

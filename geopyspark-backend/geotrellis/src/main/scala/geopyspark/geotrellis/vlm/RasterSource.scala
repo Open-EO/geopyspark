@@ -5,14 +5,13 @@ import geopyspark.geotrellis.{LayoutType => GPSLayoutType, LocalLayout => GPSLoc
 
 import geopyspark.geotrellis.Constants.{GEOTRELLIS, GDAL}
 
-import geotrellis.contrib.vlm._
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.contrib.vlm.gdal.GDALRasterSource
+import geotrellis.raster.geotiff.GeoTiffRasterSource
+import geotrellis.raster.gdal.GDALRasterSource
 
 import geotrellis.raster._
 import geotrellis.raster.resample._
 import geotrellis.spark._
-import geotrellis.spark.tiling._
+import geotrellis.layer._
 import geotrellis.proj4._
 import geotrellis.vector._
 import geotrellis.util._
@@ -68,7 +67,7 @@ object RasterSource {
     val reprojectedSourcesRDD: RDD[RasterSource] =
       targetCRS match {
         case crs: String =>
-          rasterSourceRDD.map { _.reproject(CRS.fromString(crs), resampleMethod) }
+          rasterSourceRDD.map { _.reproject(CRS.fromString(crs), method = resampleMethod) }
         case null =>
           rasterSourceRDD
       }
@@ -137,12 +136,12 @@ object RasterSource {
     val reprojectedSourcesRDD: RDD[RasterSource] =
       targetCRS match {
         case crs: String =>
-          rasterSourceRDD.map { _.reproject(CRS.fromString(crs), resampleMethod) }
+          rasterSourceRDD.map { _.reproject(CRS.fromString(crs), method = resampleMethod) }
         case null =>
           rasterSourceRDD
       }
 
-    val metadata: RasterSummary = RasterSummary.fromRDD(reprojectedSourcesRDD)
+    val metadata: RasterSummary[Unit] = RasterSummary.fromRDD(reprojectedSourcesRDD)
 
     val LayoutLevel(zoom, layout) =
       layoutType match {
@@ -154,10 +153,10 @@ object RasterSource {
           metadata.levelFor(scheme)
       }
 
-    val layoutRDD: RDD[LayoutTileSource] = reprojectedSourcesRDD.map { _.tileToLayout(layout, resampleMethod) }
+    val layoutRDD: RDD[LayoutTileSource[SpatialKey]] = reprojectedSourcesRDD.map { _.tileToLayout(layout, resampleMethod) }
 
     val tileLayerMetadata: TileLayerMetadata[SpatialKey] =
-      metadata.toTileLayerMetadata(layout, zoom)._1
+      metadata.toTileLayerMetadata(layout)
 
     val tiledRDD: RDD[(SpatialKey, MultibandTile)] =
       layoutRDD.flatMap { _.readAll() }
@@ -205,14 +204,14 @@ object RasterSource {
         case GEOTRELLIS =>
           crs match {
             case Some(projection) =>
-              (path: String) => GeoTiffRasterSource(path).reproject(projection, resampleMethod)
+              (path: String) => GeoTiffRasterSource(path).reproject(projection, method = resampleMethod)
             case None =>
               (path: String) => GeoTiffRasterSource(path)
           }
         case GDAL =>
           crs match {
             case Some(projection) =>
-              (path: String) => GDALRasterSource(path).reproject(projection, resampleMethod)
+              (path: String) => GDALRasterSource(path).reproject(projection, method = resampleMethod)
             case None =>
               (path: String) => GDALRasterSource(path)
           }
@@ -230,7 +229,7 @@ object RasterSource {
 
     val sourcesRDD: RDD[RasterSource] = readingSourcesRDD.map { _.source }
 
-    val rasterSummary: RasterSummary = geotrellis.contrib.vlm.RasterSummary.fromRDD(sourcesRDD)
+    val rasterSummary: RasterSummary[Unit] = geotrellis.spark.RasterSummary.fromRDD(sourcesRDD)
 
     val LayoutLevel(zoom, layout) =
       layoutType match {

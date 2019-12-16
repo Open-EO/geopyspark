@@ -1,6 +1,7 @@
 package geopyspark.geotools
 
-import geotrellis.spark.io.hadoop._
+import geotrellis.store.hadoop._
+import geotrellis.store.hadoop.util._
 
 import org.apache.spark._
 import org.apache.hadoop.fs.Path

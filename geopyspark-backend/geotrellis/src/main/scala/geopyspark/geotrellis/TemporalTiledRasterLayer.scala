@@ -11,7 +11,6 @@ import protos.tupleMessages._
 import geotrellis.proj4._
 import geotrellis.raster._
 import geotrellis.raster.distance._
-import geotrellis.raster.histogram._
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.io.geotiff.compression._
 import geotrellis.raster.mapalgebra.focal.{Square, Slope}
@@ -19,27 +18,31 @@ import geotrellis.raster.mapalgebra.focal.hillshade._
 import geotrellis.raster.rasterize._
 import geotrellis.raster.render._
 import geotrellis.raster.resample.{ResampleMethod, PointResampleMethod, Resample}
+import geotrellis.raster.buffer.BufferedTile
 import geotrellis.spark._
 import geotrellis.spark.buffer._
 import geotrellis.spark.costdistance.IterativeCostDistance
 import geotrellis.spark.filter._
-import geotrellis.spark.io._
-import geotrellis.spark.io.json._
+import geotrellis.store._
+import geotrellis.store.json._
 import geotrellis.spark.mapalgebra.local._
 import geotrellis.spark.mapalgebra.focal._
-import geotrellis.spark.mask.Mask
+import geotrellis.layer.mask.Mask
+import geotrellis.spark.mask.MaskRDD
 import geotrellis.spark.pyramid._
 import geotrellis.spark.reproject._
 import geotrellis.spark.tiling._
 import geotrellis.spark.util._
+import geotrellis.layer._
 import geotrellis.util._
 import geotrellis.vector._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.triangulation._
 import geotrellis.vector.voronoi._
 
-import spray.json._
-import spray.json.DefaultJsonProtocol._
+import _root_.io.circe.syntax._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
 import spire.syntax.cfor._
 
 import org.locationtech.jts.geom.Coordinate
@@ -87,7 +90,7 @@ class TemporalTiledRasterLayer(
   }
 
   def mask(geometries: Seq[MultiPolygon]): TiledRasterLayer[SpaceTimeKey] =
-    TemporalTiledRasterLayer(zoomLevel, Mask(rdd, geometries, Mask.Options.DEFAULT))
+    TemporalTiledRasterLayer(zoomLevel, MaskRDD(rdd, geometries, Mask.Options.DEFAULT))
 
   def mask(
     groupedRDD: RDD[(SpatialKey, Iterable[Geometry])],
@@ -316,7 +319,7 @@ class TemporalTiledRasterLayer(
 
     val _neighborhood = getNeighborhood(neighborhood, param1, param2, param3)
     val cellSize = rdd.metadata.layout.cellSize
-    val op: ((Tile, Option[GridBounds]) => Tile) = getOperation(operation, _neighborhood, cellSize, param1)
+    val op: ((Tile, Option[GridBounds[Int]]) => Tile) = getOperation(operation, _neighborhood, cellSize, param1)
 
     val result: TileLayerRDD[SpaceTimeKey] =
       partitionStrategy match {
@@ -362,7 +365,7 @@ class TemporalTiledRasterLayer(
     val mt = rdd.metadata.mapTransform
     val cellSize = rdd.metadata.cellSize
     val neighborhood = Square(1)
-    val gridBounds = rdd.metadata.gridBounds
+    val gridBounds = rdd.metadata.tileBounds
     val partitioner = rdd.partitioner
 
     TemporalTiledRasterLayer(
@@ -595,14 +598,14 @@ class TemporalTiledRasterLayer(
       .value
       .groupBy(_._1)
       .map { case (k, vs) => k.toString -> vs.map { case (_, v) => v }.sum.toString }
-      .toJson
-      .compactPrint
+      .asJson
+      .noSpaces
   }
 
   def filterByTimes(
     times: java.util.ArrayList[String]
   ): TemporalTiledRasterLayer = {
-    val bounds: KeyBounds[SpatialKey] = KeyBounds(rdd.metadata.gridBounds)
+    val bounds: KeyBounds[SpatialKey] = KeyBounds(rdd.metadata.tileBounds)
     val minKey = bounds.minKey
     val maxKey = bounds.maxKey
     val timeBoundaries: Array[KeyBounds[SpaceTimeKey]] =
@@ -636,7 +639,7 @@ object TemporalTiledRasterLayer {
     javaRDD: JavaRDD[Array[Byte]],
     metadata: String
   ): TemporalTiledRasterLayer = {
-    val md = metadata.parseJson.convertTo[TileLayerMetadata[SpaceTimeKey]]
+    val md = parse(metadata).valueOr(throw _).as[TileLayerMetadata[SpaceTimeKey]].valueOr(throw _)
     val tileLayer = MultibandTileLayerRDD(
       PythonTranslator.fromPython[(SpaceTimeKey, MultibandTile), ProtoTuple](javaRDD, ProtoTuple.parseFrom), md)
 
@@ -648,7 +651,7 @@ object TemporalTiledRasterLayer {
     zoomLevel: Int,
     metadata: String
   ): TemporalTiledRasterLayer = {
-    val md = metadata.parseJson.convertTo[TileLayerMetadata[SpaceTimeKey]]
+    val md = parse(metadata).valueOr(throw _).as[TileLayerMetadata[SpaceTimeKey]].valueOr(throw _)
     val tileLayer = MultibandTileLayerRDD(
       PythonTranslator.fromPython[(SpaceTimeKey, MultibandTile), ProtoTuple](javaRDD, ProtoTuple.parseFrom), md)
 

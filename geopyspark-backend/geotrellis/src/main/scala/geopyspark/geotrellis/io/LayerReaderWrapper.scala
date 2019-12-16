@@ -7,19 +7,20 @@ import geotrellis.vector.io.wkt.WKT
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.raster._
 import geotrellis.proj4._
+import geotrellis.layer._
 import geotrellis.spark._
-import geotrellis.spark.io._
-import geotrellis.spark.io.cog._
-import geotrellis.spark.io.file._
-import geotrellis.spark.io.hadoop._
-import geotrellis.spark.io.json._
-import geotrellis.spark.io.s3._
+import geotrellis.spark.store._
+import geotrellis.spark.store.cog._
+import geotrellis.spark.store.file._
+import geotrellis.spark.store.hadoop._
+import geotrellis.store._
+import geotrellis.store.cog._
+import geotrellis.store.json._
+import geotrellis.store.s3._
 
 import org.apache.spark._
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
-
-import spray.json._
 
 import java.time.ZonedDateTime
 import java.util.ArrayList
@@ -65,7 +66,7 @@ class LayerReaderWrapper(sc: SparkContext) {
         // Aim for ~16MB per partition
         val tilesPerPartition = (1 << 24) / tileBytes
         // TODO: consider temporal dimension size as well
-        val expectedTileCounts: Seq[Long] = layerQuery(layerMetadata).map(_.toGridBounds.size)
+        val expectedTileCounts: Seq[Long] = layerQuery(layerMetadata).map(_.toGridBounds.size.toLong)
         try {
           math.max(1, (expectedTileCounts.reduce( _ + _) / tilesPerPartition).toInt)
         } catch {

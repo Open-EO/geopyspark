@@ -4,7 +4,7 @@ import geopyspark.util._
 import geopyspark.geotrellis._
 import protos.keyMessages._
 import geopyspark.geotrellis.testkit._
-import geotrellis.spark._
+import geotrellis.layer._
 
 import org.apache.spark._
 import org.apache.spark.rdd.RDD
