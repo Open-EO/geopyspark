@@ -35,13 +35,13 @@ class AttributeStoreWrapper(uri: String) {
       header.layerType match {
         case COGLayerType =>
           header.keyClass match {
-            case "geotrellis.spark.SpatialKey" =>
+            case "geotrellis.layer.SpatialKey" =>
               attributeStore
                 .readMetadata[COGLayerStorageMetadata[SpatialKey]](LayerId(id.name, 0))
                 .metadata
                 .tileLayerMetadata(id.zoom)
                 .asJson
-            case "geotrellis.spark.SpaceTimeKey" =>
+            case "geotrellis.layer.SpaceTimeKey" =>
               attributeStore
                 .readMetadata[COGLayerStorageMetadata[SpaceTimeKey]](LayerId(id.name, 0))
                 .metadata

@@ -54,7 +54,7 @@ class ValueReaderWrapper(uri: String) {
 
     try {
       (header.keyClass, header.valueClass) match {
-        case ("geotrellis.spark.SpatialKey", "geotrellis.raster.Tile") => {
+        case ("geotrellis.layer.SpatialKey", "geotrellis.raster.Tile") => {
           val spatialKey = SpatialKey(col, row)
           val result = valueReader match {
             case Left(cogReader) => cogReader.reader[SpatialKey, Tile](id).read(spatialKey)
@@ -62,7 +62,7 @@ class ValueReaderWrapper(uri: String) {
           }
           PythonTranslator.toPython[MultibandTile, ProtoMultibandTile](MultibandTile(result))
         }
-        case ("geotrellis.spark.SpatialKey", "geotrellis.raster.MultibandTile") => {
+        case ("geotrellis.layer.SpatialKey", "geotrellis.raster.MultibandTile") => {
           val spatialKey = SpatialKey(col, row)
           val result = valueReader match {
             case Left(cogReader) => cogReader.reader[SpatialKey, MultibandTile](id).read(spatialKey)
@@ -70,7 +70,7 @@ class ValueReaderWrapper(uri: String) {
           }
           PythonTranslator.toPython[MultibandTile, ProtoMultibandTile](result)
         }
-        case ("geotrellis.spark.SpaceTimeKey", "geotrellis.raster.Tile") => {
+        case ("geotrellis.layer.SpaceTimeKey", "geotrellis.raster.Tile") => {
           val spaceKey = SpaceTimeKey(col, row, ZonedDateTime.parse(zdt))
           val result = valueReader match {
             case Left(cogReader) => cogReader.reader[SpaceTimeKey, Tile](id).read(spaceKey)
@@ -78,7 +78,7 @@ class ValueReaderWrapper(uri: String) {
           }
           PythonTranslator.toPython[MultibandTile, ProtoMultibandTile](MultibandTile(result))
         }
-        case ("geotrellis.spark.SpaceTimeKey", "geotrellis.raster.MultibandTile") => {
+        case ("geotrellis.layer.SpaceTimeKey", "geotrellis.raster.MultibandTile") => {
           val spaceKey = SpaceTimeKey(col, row, ZonedDateTime.parse(zdt))
           val result = valueReader match {
             case Left(cogReader) => cogReader.reader[SpaceTimeKey, MultibandTile](id).read(spaceKey)

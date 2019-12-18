@@ -461,7 +461,7 @@ The layer metadata is stored under attribute named ``metadata``. Care should be 
 ::
 
  {'header': {'format': 'file',
-   'keyClass': 'geotrellis.spark.SpatialKey',
+   'keyClass': 'geotrellis.layer.SpatialKey',
    'path': 'spatial-layer/11',
    'valueClass': 'geotrellis.raster.MultibandTile'},
   'keyIndex': {'properties': {'keyBounds': {'maxKey': {'col': 1485, 'row': 996}, 'minKey': {'col': 1479, 'row': 984}}},

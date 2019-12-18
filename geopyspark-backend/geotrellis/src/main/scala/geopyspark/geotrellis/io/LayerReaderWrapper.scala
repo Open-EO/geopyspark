@@ -75,7 +75,7 @@ class LayerReaderWrapper(sc: SparkContext) {
       }
 
     header.keyClass match {
-      case "geotrellis.spark.SpatialKey" =>
+      case "geotrellis.layer.SpatialKey" =>
         val layerMetadata =
           header.layerType match {
             case COGLayerType =>
@@ -113,7 +113,7 @@ class LayerReaderWrapper(sc: SparkContext) {
 
         new SpatialTiledRasterLayer(Some(zoom), rdd)
 
-      case "geotrellis.spark.SpaceTimeKey" =>
+      case "geotrellis.layer.SpaceTimeKey" =>
         val layerMetadata =
           header.layerType match {
             case COGLayerType =>
