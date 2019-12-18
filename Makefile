@@ -10,7 +10,7 @@ ASSEMBLYNAME := geotrellis-backend-assembly-0.4.2-openeo.jar
 BUILD-ASSEMBLY := geopyspark-backend/geotrellis/target/scala-2.11/${ASSEMBLYNAME}
 DIST-ASSEMBLY := ${JAR-PATH}/${ASSEMBLYNAME}
 
-WHEELNAME := geopyspark-0.4.2-py3-none-any.whl
+WHEELNAME := geopyspark-0.4.2+openeo-py3-none-any.whl
 WHEEL := dist/${WHEELNAME}
 
 SCALA_SRC := $(call rwildcard, geopyspark-backend/geotrellis/src/, *.scala)
