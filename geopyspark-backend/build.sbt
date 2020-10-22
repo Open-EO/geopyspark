@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
 
   externalResolvers := Seq(
     "Geotoolkit Repo" at "http://maven.geotoolkit.org",
-    "OSGeo GeoTools" at "http://download.osgeo.org/webdav/geotools/",
+    "OSGeo GeoTools" at "https://repo.osgeo.org/repository/release/",
     "geosolutions" at "http://maven.geo-solutions.it/",
     "LocationTech Snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
     "LocationTech Releases" at "https://repo.locationtech.org/content/groups/releases",
