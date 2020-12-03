@@ -150,10 +150,10 @@ object TileReaders {
 
     def receive = {
       case Initialize =>
-        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)
+        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)(ec)
       case FulfillRequests(requests) =>
         fulfillRequests(requests)
-        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)
+        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)(ec)
     }
 
     def fulfillRequests(requests: Seq[QueueRequest]) = {

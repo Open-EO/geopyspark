@@ -7,7 +7,6 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
-    "-Yinline-warnings",
     "-language:implicitConversions",
     "-language:reflectiveCalls",
     "-language:higherKinds",
@@ -31,7 +30,7 @@ lazy val commonSettings = Seq(
   ),
 
   addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
-  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
 lazy val publishSettings =
