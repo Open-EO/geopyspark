@@ -2,10 +2,10 @@ name := "geotools-backend"
 
 libraryDependencies ++= Seq(
   "org.apache.spark"            %% "spark-core"            % "3.4.0" % "provided",
-  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-geotools"   % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-shapefile"  % Version.geotrellis,
+  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-geotools"   % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-shapefile"  % Version.geotrellis % "provided",
   "de.javakaffee" % "kryo-serializers" % "0.38" exclude("com.esotericsoftware", "kryo")
 )
 
