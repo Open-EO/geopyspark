@@ -7,7 +7,7 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 JAR-PATH := geopyspark/jars
 
 ASSEMBLYNAME := geotrellis-backend-assembly-0.4.7-openeo.jar
-BUILD-ASSEMBLY := geopyspark-backend/geotrellis/target/scala-2.11/${ASSEMBLYNAME}
+BUILD-ASSEMBLY := geopyspark-backend/geotrellis/target/scala-2.12/${ASSEMBLYNAME}
 DIST-ASSEMBLY := ${JAR-PATH}/${ASSEMBLYNAME}
 
 WHEELNAME := geopyspark-0.4.7+openeo-py3-none-any.whl

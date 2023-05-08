@@ -69,7 +69,7 @@ object TileReaders {
             case Failure(e: Throwable) => throw e
           }
         }
-      }
+      }(global)
     }
   }
 
@@ -150,10 +150,10 @@ object TileReaders {
 
     def receive = {
       case Initialize =>
-        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)
+        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)(global)
       case FulfillRequests(requests) =>
         fulfillRequests(requests)
-        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)
+        context.system.scheduler.scheduleOnce(RDDLookup.interval, aggregator, DumpRequests)(global)
     }
 
     def fulfillRequests(requests: Seq[QueueRequest]) = {
