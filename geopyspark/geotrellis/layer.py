@@ -452,7 +452,9 @@ class RasterLayer(CachableLayer, TileLayer):
         read_method = ReadMethod(read_method)
 
         if target_crs:
-            target_crs = crs_to_proj4(target_crs)
+            if not isinstance(target_crs, int):
+                target_crs = crs_to_proj4(target_crs)
+            target_crs = str(target_crs)
 
         pysc = get_spark_context()
 
@@ -934,7 +936,9 @@ class RasterLayer(CachableLayer, TileLayer):
         resample_method = ResampleMethod(resample_method)
 
         if target_crs:
-            target_crs = crs_to_proj4(target_crs)
+            if not isinstance(target_crs, int):
+                target_crs = crs_to_proj4(target_crs)
+            target_crs = str(target_crs)
             return _reproject(target_crs, layout, resample_method, partition_strategy, self)
 
         if isinstance(layout, Metadata):
@@ -1162,7 +1166,9 @@ class TiledRasterLayer(CachableLayer, TileLayer):
         read_method = ReadMethod(read_method)
 
         if target_crs:
-            target_crs = crs_to_proj4(target_crs)
+            if not isinstance(target_crs, int):
+                target_crs = crs_to_proj4(target_crs)
+            target_crs = str(target_crs)
 
         pysc = get_spark_context()
 
@@ -1802,7 +1808,9 @@ class TiledRasterLayer(CachableLayer, TileLayer):
         resample_method = ResampleMethod(resample_method)
 
         if target_crs:
-            target_crs = crs_to_proj4(target_crs)
+            if not isinstance(target_crs, int):
+                target_crs = crs_to_proj4(target_crs)
+            target_crs = str(target_crs)
             return _reproject(target_crs, layout, resample_method, partition_strategy, self)
 
         if isinstance(layout, LayoutDefinition):
