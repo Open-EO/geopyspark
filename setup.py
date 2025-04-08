@@ -28,7 +28,6 @@ setup_args = dict(
         'geopyspark.geotools',
         'geopyspark.geotools.protobuf',
         'geopyspark.command',
-        'geopyspark.jars'
     ],
     entry_points={
         "console_scripts": ['geopyspark = geopyspark.command.configuration:main']
@@ -47,8 +46,7 @@ setup_args = dict(
     ]
 )
 
-if 'ASSEMBLED' in os.environ.keys():
-    setup_args['include_package_data'] = True
+setup_args['include_package_data'] = False
 
 
 if __name__ == "__main__":
