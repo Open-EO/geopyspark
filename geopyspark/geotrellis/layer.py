@@ -1083,6 +1083,9 @@ class TiledRasterLayer(CachableLayer, TileLayer):
 
         self.is_floating_point_layer = self.srdd.isFloatingPointLayer()
         self.layer_metadata = Metadata.from_dict(json.loads(self.srdd.layerMetadata()))
+        epsg_code = self.srdd.rdd().metadata().crs().epsgCode()
+        if epsg_code.isDefined():
+            self.layer_metadata.crs = "EPSG:" + str(epsg_code.get())
         self.zoom_level = self.srdd.getZoom()
 
     @classmethod
