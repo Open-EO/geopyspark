@@ -747,7 +747,7 @@ class Metadata(object):
 
     def __init__(self, bounds, crs, cell_type, extent, layout_definition):
         self.bounds = bounds
-        self.crs = crs_to_proj4(crs)
+        self.crs = crs
 
         if isinstance(cell_type, CellType):
             self.cell_type = CellType(cell_type).value

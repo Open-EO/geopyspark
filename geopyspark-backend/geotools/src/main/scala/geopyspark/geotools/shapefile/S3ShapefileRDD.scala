@@ -1,7 +1,7 @@
 package geopyspark.geotools.shapefile
 
 import geopyspark.geotools._
-import geotrellis.spark.io.s3._
+import geotrellis.store.s3._
 
 import org.apache.spark._
 import org.apache.spark.rdd._
@@ -14,9 +14,9 @@ import org.geotools.feature.simple._
 import org.opengis.feature.simple._
 import org.opengis.feature.`type`.Name
 
-import com.amazonaws.auth._
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.{ListObjectsRequest, ObjectListing}
+// import com.amazonaws.auth._
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{ListObjectsV2Request, ListObjectsV2Response}
 
 import java.net.URI
 

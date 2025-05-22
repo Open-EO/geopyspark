@@ -4,14 +4,13 @@ import Constants._
 import geopyspark.geotrellis.GeoTrellisUtils._
 import geotrellis.proj4._
 import geotrellis.raster._
-import geotrellis.raster.mapalgebra.focal._
+import geotrellis.raster.mapalgebra.focal.TargetCell
 import geotrellis.raster.render._
-import geotrellis.raster.histogram._
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.io.geotiff.compression._
 import geotrellis.raster.resample.ResampleMethod
 import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.store._
 import geotrellis.spark.tiling._
 import geotrellis.vector._
 import org.apache.spark._
@@ -21,7 +20,6 @@ import org.apache.spark.storage.StorageLevel
 import protos.tupleMessages.ProtoTuple
 
 import scala.util.{Either, Left, Right}
-import spray.json._
 import spire.syntax.order._
 import spire.std.any._
 

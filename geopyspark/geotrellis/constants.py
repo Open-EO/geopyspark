@@ -58,13 +58,13 @@ class LayerType(Enum):
     def _from_key_name(cls, name):
         """Covnert GeoTrellis key class name into corresponding LayerType"""
 
-        if name == "geotrellis.spark.SpatialKey" or name == "SpatialKey":
+        if name == "geotrellis.layer.SpatialKey" or name == "SpatialKey":
             return LayerType.SPATIAL
-        elif name == "geotrellis.spark.SpaceTimeKey" or name == "SpaceTimeKey":
+        elif name == "geotrellis.layer.SpaceTimeKey" or name == "SpaceTimeKey":
             return LayerType.SPACETIME
         elif name == "geotrellis.vector.ProjectedExtent" or name == "ProjectedExtent":
             return LayerType.SPATIAL
-        elif name == "geotrellis.spark.TemporalProjectedExtent" or name == "TemporalProjectedExtent":
+        elif name == "geotrellis.layer.TemporalProjectedExtent" or name == "TemporalProjectedExtent":
             return LayerType.SPACETIME
         else:
             raise ValueError("Unrecognized key class type: " + name)

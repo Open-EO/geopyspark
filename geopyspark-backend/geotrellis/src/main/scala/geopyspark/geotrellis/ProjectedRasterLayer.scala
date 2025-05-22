@@ -8,7 +8,7 @@ import geotrellis.raster._
 import geotrellis.raster.io.geotiff.{GeoTiffOptions, MultibandGeoTiff, Tags}
 import geotrellis.raster.resample.ResampleMethod
 import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.layer._
 import geotrellis.spark.reproject._
 import geotrellis.spark.tiling._
 import geotrellis.vector._
@@ -25,7 +25,10 @@ import scala.collection.JavaConverters._
 
 import java.util.ArrayList
 
-import spray.json._
+import _root_.io.circe.syntax._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
+import geotrellis.layer._
 
 
 class ProjectedRasterLayer(val rdd: RDD[(ProjectedExtent, MultibandTile)]) extends RasterLayer[ProjectedExtent] {
@@ -34,7 +37,7 @@ class ProjectedRasterLayer(val rdd: RDD[(ProjectedExtent, MultibandTile)]) exten
     val sms = RasterSummary.collect[ProjectedExtent, SpatialKey](rdd)
     require(sms.length == 1, s"Multiple raster CRS layers found: ${sms.map(_.crs).toList}")
 
-    sms.head.toTileLayerMetadata(layoutType)._1.toJson.compactPrint
+    sms.head.toTileLayerMetadata(layoutType)._1.asJson.noSpaces
   }
 
   def collectMetadata(layoutDefinition: LayoutDefinition): String = {
@@ -48,7 +51,7 @@ class ProjectedRasterLayer(val rdd: RDD[(ProjectedExtent, MultibandTile)]) exten
       sm.extent,
       sm.crs,
       sm.bounds.setSpatialBounds(layoutDefinition.mapTransform(sm.extent))
-    ).toJson.compactPrint
+    ).asJson.noSpaces
   }
 
   def tileToLayout(
@@ -56,7 +59,7 @@ class ProjectedRasterLayer(val rdd: RDD[(ProjectedExtent, MultibandTile)]) exten
     resampleMethod: ResampleMethod,
     partitionStrategy: PartitionStrategy
   ): TiledRasterLayer[SpatialKey] = {
-    val md = tileLayerMetadata.parseJson.convertTo[TileLayerMetadata[SpatialKey]]
+    val md = parse(tileLayerMetadata).valueOr(throw _).as[TileLayerMetadata[SpatialKey]].valueOr(throw _)
     val options = getTilerOptions(resampleMethod, partitionStrategy)
 
     new SpatialTiledRasterLayer(None, MultibandTileLayerRDD(rdd.tileToLayout(md, options), md))

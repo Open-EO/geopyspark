@@ -1,10 +1,11 @@
 package geopyspark.geotools
 
-import geotrellis.spark.io.s3._
+import geotrellis.store.s3._
 
 import org.apache.spark._
 
-import com.amazonaws.services.s3.model.{ListObjectsRequest, ObjectListing}
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{ListObjectsV2Request, ListObjectsV2Response}
 
 import java.net.URI
 
@@ -25,9 +26,10 @@ object S3Utils {
     extensions: Seq[String],
     s3Client: S3Client
   ): Array[String] = {
-    val objectRequest = (new ListObjectsRequest)
-      .withBucketName(s3bucket)
-      .withPrefix(s3prefix)
+    val objectRequest = ListObjectsV2Request
+      .builder()
+      .bucket(s3bucket)
+      .prefix(s3prefix)
 
     listKeys(objectRequest, s3Client)
       .filter { path => extensions.exists { e => path.endsWith(e) } }
@@ -37,14 +39,14 @@ object S3Utils {
   }
 
   // Copied from GeoTrellis codebase
-  def listKeys(listObjectsRequest: ListObjectsRequest, s3Client: S3Client): Array[String] = {
-    var listing: ObjectListing = null
+  def listKeys(listObjectsRequestBuilder: ListObjectsV2Request.Builder, s3Client: S3Client): Array[String] = {
+    var listing: ListObjectsV2Response = null
     val result = mutable.ListBuffer[String]()
     do {
-      listing = s3Client.listObjects(listObjectsRequest)
+      listing = s3Client.listObjectsV2(listObjectsRequestBuilder.build())
       // avoid including "directories" in the input split, can cause 403 errors on GET
-      result ++= listing.getObjectSummaries.asScala.map(_.getKey).filterNot(_ endsWith "/")
-      listObjectsRequest.setMarker(listing.getNextMarker)
+      result ++= listing.contents().asScala.map(_.key()).filterNot(_ endsWith "/")
+      listObjectsRequestBuilder.continuationToken(listing.nextContinuationToken())
     } while (listing.isTruncated)
 
     result.toArray

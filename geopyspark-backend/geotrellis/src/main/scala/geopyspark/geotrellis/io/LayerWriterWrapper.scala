@@ -3,14 +3,11 @@ package geopyspark.geotrellis.io
 import geopyspark.geotrellis._
 
 import geotrellis.raster._
-import geotrellis.spark._
-import geotrellis.spark.io._
-import geotrellis.spark.io.cog._
-import geotrellis.spark.io.file._
-import geotrellis.spark.io.hadoop._
-import geotrellis.spark.io.index._
-import geotrellis.spark.io.index.hilbert._
-import geotrellis.spark.io.s3._
+import geotrellis.layer._
+import geotrellis.store._
+import geotrellis.spark.store._
+import geotrellis.spark.store.cog._
+import geotrellis.store.index._
 import geotrellis.vector._
 
 import spray.json._

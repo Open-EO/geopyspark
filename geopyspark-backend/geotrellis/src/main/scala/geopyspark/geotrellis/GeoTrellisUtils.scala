@@ -1,13 +1,14 @@
 package geopyspark.geotrellis
 
 import geotrellis.proj4._
-import geotrellis.raster._
+import geotrellis.raster.{CellSize, Tile, TileLayout}
 import geotrellis.raster.mapalgebra.focal._
 import geotrellis.raster.render._
 import geotrellis.raster.resample.ResampleMethod
 import geotrellis.vector._
 import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.store._
+import geotrellis.raster.GridBounds
 import geotrellis.spark.reproject._
 import geotrellis.spark.tiling._
 import spray.json._
@@ -66,7 +67,7 @@ object GeoTrellisUtils {
     neighborhood: Neighborhood,
     cellSize: CellSize,
     param1: Double
-  ): ((Tile, Option[GridBounds]) => Tile) = {
+  ): ((Tile, Option[GridBounds[Int]]) => Tile) = {
     val target = TargetCell.All
 
     operation match {

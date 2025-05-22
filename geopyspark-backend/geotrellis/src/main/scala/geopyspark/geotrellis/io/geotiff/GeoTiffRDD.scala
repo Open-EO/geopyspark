@@ -1,22 +1,20 @@
 package geopyspark.geotrellis.io.geotiff
 
 import geopyspark.geotrellis._
-
 import geotrellis.proj4._
-import geotrellis.spark.io.avro._
-import geotrellis.spark.io.hadoop._
-import geotrellis.spark.io.s3._
-import geotrellis.spark.io.s3.testkit._
+import geotrellis.store.avro._
+import geotrellis.spark.store.hadoop._
+import geotrellis.spark.store.s3._
+import geotrellis.store.s3._
 
 import scala.collection.JavaConversions._
-
 import java.net.URI
+
 import scala.reflect._
-
-import com.amazonaws.auth.BasicAWSCredentials
-
+import software.amazon.awssdk.services.s3.S3Client
 import org.apache.spark._
 import org.apache.hadoop.fs.Path
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 
 
 object GeoTiffRDD {
@@ -69,11 +67,13 @@ object GeoTiffRDD {
         val secretKey = conf.get(s"spark.hadoop.fs.${scheme}.secret.key", "")
 
         stringMap.getOrElse("s3_client", DEFAULT) match {
-          case DEFAULT if accessKey.isEmpty => default.getS3Client
+          case DEFAULT if accessKey.isEmpty => default.getClient
           case DEFAULT =>
-            () => AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey), S3Client.defaultConfiguration)
+            () => S3Client.builder()
+              .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+              .build()
           case MOCK =>
-            () => new MockS3Client()
+            throw new UnsupportedOperationException("S3Client")
           case client: String => throw new Error(s"Could not find the given S3Client, $client")
         }
       }
@@ -87,7 +87,7 @@ object GeoTiffRDD {
         partitionBytes = partitionBytes,
         chunkSize = intMap.get("chunk_size"),
         delimiter = stringMap.get("delimiter"),
-        getS3Client = getS3Client
+        getClient = getS3Client
       )
     }
   }

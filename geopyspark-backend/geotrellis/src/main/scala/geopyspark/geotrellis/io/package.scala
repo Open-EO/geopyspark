@@ -1,7 +1,7 @@
 package geopyspark.geotrellis
 
 import geotrellis.spark._
-import geotrellis.spark.io.{AttributeStore, LayerHeader}
+import geotrellis.store.{AttributeStore, LayerHeader, LayerId}
 import geotrellis.util._
 
 import scala.util.Try

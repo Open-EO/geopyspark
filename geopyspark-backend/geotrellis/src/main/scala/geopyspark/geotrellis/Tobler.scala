@@ -2,14 +2,14 @@ package geopyspark.geotrellis
 
 import geotrellis.raster._
 import geotrellis.raster.mapalgebra.local._
-import geotrellis.raster.mapalgebra.focal._
+import geotrellis.raster.mapalgebra.focal.{Slope, TargetCell}
 
 
 object Tobler {
   def apply(
     r: Tile,
     n: Neighborhood,
-    bounds: Option[GridBounds],
+    bounds: Option[GridBounds[Int]],
     cs: CellSize,
     z: Double,
     target: TargetCell = TargetCell.All

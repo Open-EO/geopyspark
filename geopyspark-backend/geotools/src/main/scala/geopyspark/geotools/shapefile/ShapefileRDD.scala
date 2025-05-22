@@ -6,8 +6,8 @@ import geopyspark.util._
 import protos.simpleFeatureMessages._
 
 import geotrellis.vector._
-import geotrellis.spark.io.s3._
-import geotrellis.spark.io.s3.testkit._
+import geotrellis.store.s3._
+import software.amazon.awssdk.services.s3.S3Client
 import geotrellis.geotools._
 
 import org.apache.spark._
@@ -36,11 +36,11 @@ object ShapefileRDD {
         case "s3" =>
           val client =
             s3Client match {
-              case null => S3Client.DEFAULT
+              case null => S3Client.create()
               case s: String =>
                 s match {
-                  case "default" => S3Client.DEFAULT
-                  case "mock" => new MockS3Client()
+                  case "default" => S3Client.create()
+                  case "mock" => throw new UnsupportedOperationException("S3Client")
                   case _ => throw new Exception(s"Unkown S3Client specified, ${s}")
                 }
             }

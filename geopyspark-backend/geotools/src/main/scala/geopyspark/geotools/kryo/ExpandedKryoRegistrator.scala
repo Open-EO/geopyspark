@@ -1,6 +1,6 @@
 package geopyspark.geotools.kryo
 
-import geotrellis.spark.io.kryo._
+import geotrellis.spark.store.kryo._
 
 import com.esotericsoftware.kryo.Kryo
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}

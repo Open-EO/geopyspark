@@ -5,7 +5,7 @@ import geopyspark.geotrellis._
 import geotrellis.raster._
 import geotrellis.raster.render._
 import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.store._
 import geotrellis.vector._
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}

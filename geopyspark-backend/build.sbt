@@ -7,20 +7,20 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
-    "-Yinline-warnings",
     "-language:implicitConversions",
     "-language:reflectiveCalls",
     "-language:higherKinds",
     "-language:postfixOps",
     "-language:existentials",
-    "-feature"
+    "-feature",
+    "-target:jvm-1.8"
   ),
   shellPrompt := { s => Project.extract(s).currentProject.id + " > " },
 
   externalResolvers := Seq(
-    "Geotoolkit Repo" at "http://maven.geotoolkit.org",
-    "OSGeo GeoTools" at "http://download.osgeo.org/webdav/geotools/",
-    "geosolutions" at "http://maven.geo-solutions.it/",
+    "Geotoolkit Repo" at "https://maven.geotoolkit.org",
+    "OSGeo GeoTools" at "https://repo.osgeo.org/repository/release/",
+    "geosolutions" at "https://maven.geo-solutions.it/",
     "LocationTech Snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
     "LocationTech Releases" at "https://repo.locationtech.org/content/groups/releases",
     Resolver.bintrayRepo("azavea", "maven"),
@@ -30,7 +30,7 @@ lazy val commonSettings = Seq(
   ),
 
   addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
-  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
 lazy val publishSettings =

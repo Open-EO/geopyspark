@@ -7,7 +7,7 @@ if sys.version_info < (3, 3):
 
 setup_args = dict(
     name='geopyspark',
-    version='0.4.2',
+    version='0.4.9+openeo',
     author='Jacob Bouffard, James McClain',
     author_email='jbouffard@azavea.com, jmcclain@azavea.com',
     download_url='http://github.com/locationtech-labs/geopyspark',
@@ -28,7 +28,6 @@ setup_args = dict(
         'geopyspark.geotools',
         'geopyspark.geotools.protobuf',
         'geopyspark.command',
-        'geopyspark.jars'
     ],
     entry_points={
         "console_scripts": ['geopyspark = geopyspark.command.configuration:main']
@@ -47,8 +46,7 @@ setup_args = dict(
     ]
 )
 
-if 'ASSEMBLED' in os.environ.keys():
-    setup_args['include_package_data'] = True
+setup_args['include_package_data'] = False
 
 
 if __name__ == "__main__":

@@ -80,7 +80,8 @@ def geopyspark_conf(master=None, appName=None, additional_jar_dirs=[]):
 
     conf.set(key='spark.ui.enabled', value='false')
     conf.set(key='spark.serializer', value='org.apache.spark.serializer.KryoSerializer')
-    conf.set(key='spark.kryo.registrator', value='geopyspark.geotools.kryo.ExpandedKryoRegistrator')
+    # conf.set(key='spark.kryo.registrator', value='geopyspark.geotools.kryo.ExpandedKryoRegistrator')
+    conf.set("spark.kryo.registrator", "geotrellis.spark.store.kryo.KryoRegistrator")
 
     current_location = os.path.dirname(os.path.realpath(__file__))
     cwd = os.getcwd()
@@ -97,16 +98,6 @@ def geopyspark_conf(master=None, appName=None, additional_jar_dirs=[]):
         if os.path.isfile(configuration):
             with open(os.path.join(configuration)) as config_file:
                 possible_jars.append(os.path.relpath(config_file.read(), cwd))
-
-    module_jars = [
-        os.path.abspath(resource_filename('geopyspark.jars', JAR))
-    ]
-
-    jar_dirs = [(jar, os.path.dirname(jar)) for jar in module_jars]
-
-    for jar, jar_dir in jar_dirs:
-        if jar_dir not in local_prefixes:
-            possible_jars.append(jar)
 
     returned = [glob.glob(jar_files) for jar_files in possible_jars]
     jars = [jar for sublist in returned for jar in sublist]

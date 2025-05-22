@@ -2,8 +2,8 @@ package geopyspark.geotrellis
 
 import geotrellis.vector._
 import geotrellis.raster._
-import geotrellis.spark._
-import geotrellis.spark.io.avro._
+import geotrellis.layer._
+import geotrellis.store.avro._
 
 
 object SchemaProducer {

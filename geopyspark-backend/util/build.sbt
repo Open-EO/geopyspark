@@ -1,9 +1,9 @@
 name := "util"
 
 libraryDependencies ++= Seq(
-  "org.apache.spark"            %% "spark-core"            % "2.0.0" % "provided",
-  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis
+  "org.apache.spark"            %% "spark-core"            % "3.4.0" % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis % "provided"
 )
 
 assemblyMergeStrategy in assembly := {
