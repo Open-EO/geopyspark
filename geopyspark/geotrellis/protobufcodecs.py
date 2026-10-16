@@ -183,7 +183,7 @@ def from_pb_temporal_projected_extent(pb_temporal_projected_extent):
 
     instant = datetime.datetime.utcfromtimestamp(pb_temporal_projected_extent.instant / 1000)
 
-    if pb_temporal_projected_extent.crs.epsg is not 0:
+    if pb_temporal_projected_extent.crs.epsg != 0:
         return TemporalProjectedExtent(extent=from_pb_extent(pb_temporal_projected_extent.extent),
                                        epsg=pb_temporal_projected_extent.crs.epsg,
                                        instant=instant)
@@ -402,6 +402,8 @@ def to_pb_tile(obj):
     else:
         (rows, cols) = cells.shape
 
+    print(f"encoding tile {cells.shape}")
+
     tile = ProtoTile()
     cell_type = tile.cellType
 
@@ -471,7 +473,7 @@ def to_pb_multibandtile(obj):
         cells = np.expand_dims(cells, 0)
 
     band_count = cells.shape[0]
-
+    print(f"ENCODING MULTIBAND TILE {band_count} {cells.shape}")
     def create_tile(index):
         return Tile(cells[index, :, :], obj.cell_type, obj.no_data_value)
 

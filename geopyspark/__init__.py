@@ -1,6 +1,5 @@
 import os
 import glob
-from pkg_resources import resource_filename
 from geopyspark.geopyspark_utils import ensure_pyspark
 ensure_pyspark()
 
