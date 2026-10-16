@@ -6,12 +6,12 @@ if sys.version_info < (3, 3):
     sys.exit("GeoPySpark does not support Python versions before 3.3")
 
 setup_args = dict(
-    name='geopyspark',
-    version='0.4.9+openeo',
+    name='geopyspark-openeo',
+    version='0.4.10+openeo',
     author='Jacob Bouffard, James McClain',
     author_email='jbouffard@azavea.com, jmcclain@azavea.com',
     download_url='http://github.com/locationtech-labs/geopyspark',
-    description='Python bindings for GeoTrellis',
+    description='Python bindings for GeoTrellis - openEO Fork',
     long_description=open('README.rst').read(),
     license='LICENSE',
     install_requires=[
