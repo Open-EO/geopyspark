@@ -402,7 +402,6 @@ def to_pb_tile(obj):
     else:
         (rows, cols) = cells.shape
 
-    print(f"encoding tile {cells.shape}")
 
     tile = ProtoTile()
     cell_type = tile.cellType
@@ -473,7 +472,6 @@ def to_pb_multibandtile(obj):
         cells = np.expand_dims(cells, 0)
 
     band_count = cells.shape[0]
-    print(f"ENCODING MULTIBAND TILE {band_count} {cells.shape}")
     def create_tile(index):
         return Tile(cells[index, :, :], obj.cell_type, obj.no_data_value)
 
