@@ -9,7 +9,7 @@ import protos.tupleMessages._
 
 import geotrellis.raster._
 import geotrellis.vector._
-import geotrellis.spark._
+import geotrellis.layer._
 
 import com.google.protobuf.ByteString
 

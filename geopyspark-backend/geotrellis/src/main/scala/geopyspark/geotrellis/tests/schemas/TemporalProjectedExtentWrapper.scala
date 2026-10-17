@@ -7,8 +7,8 @@ import geopyspark.geotrellis.testkit._
 
 import geotrellis.proj4._
 import geotrellis.vector.Extent
-import geotrellis.spark._
-import geotrellis.spark.io._
+import geotrellis.layer._
+import geotrellis.store._
 
 import org.apache.spark._
 import org.apache.spark.rdd.RDD

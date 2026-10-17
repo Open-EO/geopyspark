@@ -2,7 +2,8 @@ package geopyspark.geotrellis
 
 import geotrellis.proj4.CRS
 import geotrellis.raster.{CellSize, CellType, MultibandTile}
-import geotrellis.spark.tiling.{LayoutDefinition, TilerKeyMethods, ZoomedLayoutScheme}
+import geotrellis.spark.tiling.TilerKeyMethods
+import geotrellis.layer._
 import geotrellis.spark._
 import geotrellis.util._
 import geotrellis.vector.{Extent, ProjectedExtent}

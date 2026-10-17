@@ -3,13 +3,13 @@ name := "geotrellis-backend"
 libraryDependencies ++= Seq(
   "com.typesafe.akka"           %% "akka-http"             % "10.0.10",
   "com.typesafe.akka"           %% "akka-http-spray-json"  % "10.0.10",
-  "net.sf.py4j"                 %  "py4j"                  % "0.10.6",
-  "org.apache.spark"            %% "spark-core"            % "2.3.0" % "provided",
+  "net.sf.py4j"                 %  "py4j"                  % "0.10.6" % "provided",
+  "org.apache.spark"            %% "spark-core"            % "3.4.0" % "provided",
   "org.apache.commons"          % "commons-math3"          % "3.6.1",
-  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-s3-testkit" % Version.geotrellis,
-  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis,
-  "com.azavea.geotrellis"       %% "geotrellis-contrib-vlm" % Version.geotrellisContrib
+  "org.locationtech.geotrellis" %% "geotrellis-s3"         % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-spark"      % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-s3-spark"   % Version.geotrellis % "provided",
+  "org.locationtech.geotrellis" %% "geotrellis-gdal"       % Version.geotrellis % "provided"
 )
 
 assemblyShadeRules in assembly := {

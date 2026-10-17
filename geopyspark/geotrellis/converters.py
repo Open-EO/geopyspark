@@ -100,7 +100,7 @@ class LayoutDefinitionConverter:
 
         ScalaExtent = JavaClass("geotrellis.vector.Extent", gateway_client)
         ScalaTileLayout = JavaClass("geotrellis.raster.TileLayout", gateway_client)
-        ScalaLayoutDefinition = JavaClass("geotrellis.spark.tiling.LayoutDefinition", gateway_client)
+        ScalaLayoutDefinition = JavaClass("geotrellis.layer.LayoutDefinition", gateway_client)
 
         extent = ScalaExtent(python_extent.xmin, python_extent.ymin, python_extent.xmax, python_extent.ymax)
         tile_layout = ScalaTileLayout(python_tile_layout.layoutCols,

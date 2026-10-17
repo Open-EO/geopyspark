@@ -13,10 +13,9 @@ class TileToLayoutTest(BaseTestClass):
     result = get(LayerType.SPATIAL, dir_path)
     tiled_layer = result.tile_to_layout()
 
-    @pytest.fixture(autouse=True)
-    def tearDown(self):
-        yield
-        BaseTestClass.pysc._gateway.close()
+    @classmethod
+    def tearDownClass(cls):
+        cls.pysc._gateway.close()
 
     def test_tile_to_layout_layout_definition(self):
         layout_definition = self.tiled_layer.layer_metadata.layout_definition

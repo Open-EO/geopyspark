@@ -2,7 +2,7 @@ package geopyspark.geotrellis
 
 import geotrellis.raster._
 import geotrellis.spark._
-import geotrellis.spark.tiling._
+import geotrellis.layer._
 import geotrellis.vector._
 
 /** Layout scheme for building a local power of 2 pyramid.
