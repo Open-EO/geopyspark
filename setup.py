@@ -7,7 +7,7 @@ if sys.version_info < (3, 3):
 
 setup_args = dict(
     name='geopyspark-openeo',
-    version='0.4.10+openeo',
+    version='0.4.10',
     author='Jacob Bouffard, James McClain',
     author_email='jbouffard@azavea.com, jmcclain@azavea.com',
     download_url='http://github.com/locationtech-labs/geopyspark',
