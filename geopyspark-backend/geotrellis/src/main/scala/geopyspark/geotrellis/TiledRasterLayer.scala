@@ -17,24 +17,24 @@ import geotrellis.raster.render._
 import geotrellis.raster.resample.ResampleMethod
 import geotrellis.spark._
 import geotrellis.spark.costdistance.IterativeCostDistance
-import geotrellis.spark.io._
-import geotrellis.spark.io.json._
+import geotrellis.store.json._
 import geotrellis.spark.mapalgebra.local._
 import geotrellis.spark.mapalgebra.focal._
-import geotrellis.spark.mask.Mask
+import geotrellis.layer._
+import geotrellis.layer.mask.Mask
 import geotrellis.spark.pyramid._
 import geotrellis.spark.reproject._
 import geotrellis.spark.tiling._
 import geotrellis.spark.util._
-import geotrellis.util._
 import geotrellis.vector._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.triangulation._
 import geotrellis.vector.voronoi._
 
-import spray.json._
-import spray.json.DefaultJsonProtocol._
+import _root_.io.circe.{Encoder, Decoder}
+import _root_.io.circe.syntax._
 import spire.syntax.cfor._
+
 
 import org.locationtech.jts.geom.Coordinate
 
@@ -51,7 +51,7 @@ import scala.collection.mutable.ArrayBuffer
 import spire.syntax.cfor._
 
 
-abstract class TiledRasterLayer[K: SpatialComponent: JsonFormat: ClassTag: Boundable] extends TileLayer[K] with Serializable {
+abstract class TiledRasterLayer[K: SpatialComponent: Encoder: Decoder: ClassTag: Boundable] extends TileLayer[K] with Serializable {
   import Constants._
 
   type keyType = K
@@ -81,7 +81,7 @@ abstract class TiledRasterLayer[K: SpatialComponent: JsonFormat: ClassTag: Bound
 
   def collectKeys(): java.util.ArrayList[Array[Byte]]
 
-  def layerMetadata: String = rdd.metadata.toJson.prettyPrint
+  def layerMetadata: String = rdd.metadata.asJson.spaces2
 
   def mask(wkbs: java.util.ArrayList[Array[Byte]]): TiledRasterLayer[K] = {
     val geometries: Seq[MultiPolygon] = wkbs
@@ -340,47 +340,19 @@ abstract class TiledRasterLayer[K: SpatialComponent: JsonFormat: ClassTag: Bound
       }
     }
 
-  def polygonalMin(geom: Array[Byte]): Array[Int] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalMin(poly)
-      case multi: MultiPolygon => rdd.polygonalMin(multi)
-    }
+  def polygonalMin(geom: Array[Byte]): Array[Int] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalMinDouble(geom: Array[Byte]): Array[Double] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalMinDouble(poly)
-      case multi: MultiPolygon => rdd.polygonalMinDouble(multi)
-    }
+  def polygonalMinDouble(geom: Array[Byte]): Array[Double] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalMax(geom: Array[Byte]): Array[Int] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalMax(poly)
-      case multi: MultiPolygon => rdd.polygonalMax(multi)
-    }
+  def polygonalMax(geom: Array[Byte]): Array[Int] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalMaxDouble(geom: Array[Byte]): Array[Double] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalMaxDouble(poly)
-      case multi: MultiPolygon => rdd.polygonalMaxDouble(multi)
-    }
+  def polygonalMaxDouble(geom: Array[Byte]): Array[Double] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalMean(geom: Array[Byte]): Array[Double] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalMean(poly)
-      case multi: MultiPolygon => rdd.polygonalMean(multi)
-    }
+  def polygonalMean(geom: Array[Byte]): Array[Double] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalSum(geom: Array[Byte]): Array[Long] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalSum(poly)
-      case multi: MultiPolygon => rdd.polygonalSum(multi)
-    }
+  def polygonalSum(geom: Array[Byte]): Array[Long] = throw new UnsupportedOperationException("not implemented")
 
-  def polygonalSumDouble(geom: Array[Byte]): Array[Double] =
-    WKB.read(geom) match {
-      case poly: Polygon => rdd.polygonalSumDouble(poly)
-      case multi: MultiPolygon => rdd.polygonalSumDouble(multi)
-    }
+  def polygonalSumDouble(geom: Array[Byte]): Array[Double] = throw new UnsupportedOperationException("not implemented")
 
   def tobler(): TiledRasterLayer[K] = withRDD {
     rdd.withContext { rdd =>

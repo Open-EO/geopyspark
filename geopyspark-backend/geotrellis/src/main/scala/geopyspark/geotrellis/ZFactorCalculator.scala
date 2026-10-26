@@ -6,8 +6,8 @@ import geotrellis.proj4._
 import geotrellis.vector._
 
 import org.apache.commons.math3.analysis.interpolation._
-import spray.json._
-import spray.json.DefaultJsonProtocol._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
 
 
 class ZFactorCalculator(zFactorProducer: Double => Double) extends Serializable {
@@ -33,9 +33,10 @@ object ZFactorCalculator {
 
   def createZFactorCalculator(table: String): ZFactorCalculator = {
     val zFactorTable =
-      table
-        .parseJson
-        .convertTo[Map[String, String]]
+      parse(table)
+        .valueOr(throw _)
+        .as[Map[String, String]]
+        .valueOr(throw _)
         .map { case (k, v) => k.toDouble -> v.toDouble }
 
     val lattitudes = zFactorTable.keys.toArray

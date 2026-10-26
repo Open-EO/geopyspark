@@ -1,7 +1,7 @@
 package geopyspark.geotools.shapefile
 
 import geopyspark.geotools._
-import geotrellis.spark.io.hadoop._
+import geotrellis.store.hadoop._
 
 import org.geotools.data.simple
 import org.geotools.data.shapefile._

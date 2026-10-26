@@ -14,9 +14,10 @@ import geotrellis.raster.histogram.Histogram
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.io.geotiff.compression._
 import geotrellis.spark._
-import geotrellis.spark.io._
-import geotrellis.spark.io.json._
+import geotrellis.store._
+import geotrellis.store.json._
 import geotrellis.spark.tiling._
+import geotrellis.layer._
 
 import spray.json._
 import spray.json.DefaultJsonProtocol._

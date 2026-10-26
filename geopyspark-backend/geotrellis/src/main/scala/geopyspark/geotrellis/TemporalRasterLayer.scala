@@ -7,9 +7,7 @@ import geotrellis.raster._
 import geotrellis.raster.io.geotiff.{GeoTiffOptions, MultibandGeoTiff, Tags}
 import geotrellis.raster.resample.ResampleMethod
 import geotrellis.spark._
-import geotrellis.spark.io._
-import geotrellis.spark.io.json._
-import geotrellis.spark.tiling.{FloatingLayoutScheme, LayoutDefinition, LayoutScheme, ZoomedLayoutScheme}
+import geotrellis.layer._
 import geotrellis.spark.reproject._
 
 import org.apache.spark.api.java.JavaRDD
@@ -25,8 +23,9 @@ import scala.collection.JavaConverters._
 import java.util.ArrayList
 import java.time.{ZonedDateTime, ZoneId}
 
-import spray.json._
-
+import _root_.io.circe.syntax._
+import _root_.io.circe.parser.parse
+import cats.syntax.either._
 
 class TemporalRasterLayer(val rdd: RDD[(TemporalProjectedExtent, MultibandTile)]) extends RasterLayer[TemporalProjectedExtent] {
 
@@ -34,7 +33,7 @@ class TemporalRasterLayer(val rdd: RDD[(TemporalProjectedExtent, MultibandTile)]
     val sms = RasterSummary.collect[TemporalProjectedExtent, SpaceTimeKey](rdd)
     require(sms.length == 1, s"Multiple raster CRS layers found: ${sms.map(_.crs).toList}")
 
-    sms.head.toTileLayerMetadata(layoutType)._1.toJson.compactPrint
+    sms.head.toTileLayerMetadata(layoutType)._1.asJson.noSpaces
   }
 
   def collectMetadata(layoutDefinition: LayoutDefinition): String = {
@@ -48,7 +47,7 @@ class TemporalRasterLayer(val rdd: RDD[(TemporalProjectedExtent, MultibandTile)]
       sm.extent,
       sm.crs,
       sm.bounds.setSpatialBounds(layoutDefinition.mapTransform(sm.extent))
-    ).toJson.compactPrint
+    ).asJson.noSpaces
   }
 
   def tileToLayout(
@@ -56,7 +55,7 @@ class TemporalRasterLayer(val rdd: RDD[(TemporalProjectedExtent, MultibandTile)]
     resampleMethod: ResampleMethod,
     partitionStrategy: PartitionStrategy
   ): TiledRasterLayer[SpaceTimeKey] = {
-    val md = layerMetadata.parseJson.convertTo[TileLayerMetadata[SpaceTimeKey]]
+    val md = parse(layerMetadata).valueOr(throw _).as[TileLayerMetadata[SpaceTimeKey]].valueOr(throw _)
     val options = getTilerOptions(resampleMethod, partitionStrategy)
 
     new TemporalTiledRasterLayer(None, MultibandTileLayerRDD(rdd.tileToLayout(md, options), md))

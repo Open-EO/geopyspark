@@ -2,7 +2,7 @@ package geopyspark.geotrellis.testkit
 
 import geopyspark.geotrellis._
 import geotrellis.spark._
-import geotrellis.spark.io.avro._
+import geotrellis.store.avro._
 
 import org.apache.spark._
 import org.apache.spark.rdd.RDD
